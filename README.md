@@ -8,7 +8,7 @@ Travault is a full-stack AI travel planning web application that generates perso
 
 ## Live Demo
 
-🌐(https://travault-six.vercel.app/)
+🌐https://travault-six.vercel.app/
 
 ---
 
@@ -128,34 +128,6 @@ npm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173)
-
----
-
-## Project Structure
-
-travault/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── components/
-│   │   └── ui/          # shadcn components
-│   ├── lib/
-│   │   ├── gemini.js    # Groq/AI functions
-│   │   └── supabase.js  # Supabase client
-│   ├── pages/
-│   │   ├── LandingPage.jsx
-│   │   ├── Dashboard.jsx
-│   │   ├── PlanTrip.jsx
-│   │   └── TripDetails.jsx
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── index.css
-├── .env                 # Not committed
-├── .gitignore
-├── index.html
-├── vite.config.js
-└── package.json
-
 
 ---
 
