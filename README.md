@@ -8,13 +8,16 @@ Travault is a full-stack AI travel planning web application that generates perso
 
 ## Live Demo
 
-🌐 [travault.vercel.app](https://travault.vercel.app)
+🌐(https://travault-six.vercel.app/)
 
 ---
 
 ## Screenshots
 
-> *(Add screenshots here after deployment)*
+> <img width="1915" height="1031" alt="image" src="https://github.com/user-attachments/assets/2f429124-3bc2-4e2e-9884-60a043d8511f" />
+> <img width="1916" height="1032" alt="image" src="https://github.com/user-attachments/assets/08981d9d-b59a-4090-8cf5-4d94c665ce72" />
+
+
 
 ---
 
@@ -129,3 +132,66 @@ Open [http://localhost:5173](http://localhost:5173)
 ---
 
 ## Project Structure
+
+travault/
+├── public/
+│   └── favicon.svg
+├── src/
+│   ├── components/
+│   │   └── ui/          # shadcn components
+│   ├── lib/
+│   │   ├── gemini.js    # Groq/AI functions
+│   │   └── supabase.js  # Supabase client
+│   ├── pages/
+│   │   ├── LandingPage.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── PlanTrip.jsx
+│   │   └── TripDetails.jsx
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+├── .env                 # Not committed
+├── .gitignore
+├── index.html
+├── vite.config.js
+└── package.json
+
+
+---
+
+## Deployment
+
+This project is deployed on Vercel. To deploy your own:
+
+1. Push the repository to GitHub
+2. Import the repo on [vercel.com](https://vercel.com)
+3. Add all environment variables in Vercel project settings
+4. Deploy — Vercel auto-detects Vite and handles the build
+
+---
+
+## Roadmap
+
+- [ ] Weather forecast for travel dates
+- [ ] Mobile responsive design
+- [ ] Interactive globe visualization
+- [ ] OpenWeatherMap integration
+- [ ] Dark/Light mode toggle
+- [ ] Multi-city trip planning
+
+---
+
+## Author
+
+**Sumit Shekhawat**
+- GitHub: [@singhsumit26](https://github.com/singhsumit26)
+
+---
+
+## License
+
+MIT License — feel free to use this project for learning and portfolio purposes.
+
+---
+
+*Built using React, Groq AI, and Supabase*
