@@ -73,7 +73,8 @@ function PlaceInput({ label, icon, name, value, onChange, onSelect, placeholder 
   const inputStyle = {
     width: '100%', padding: '0.75rem 1rem', fontSize: '0.9rem',
     background: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border)',
-    color: 'var(--color-cream)', outline: 'none', transition: 'border-color 0.3s', fontFamily: 'inherit'
+    color: 'var(--color-cream)', outline: 'none', transition: 'border-color 0.3s', fontFamily: 'inherit',
+    boxSizing: 'border-box'
   }
 
   return (
@@ -120,6 +121,7 @@ function PlaceInput({ label, icon, name, value, onChange, onSelect, placeholder 
 export default function PlanTrip() {
   const { user } = useUser()
   const navigate = useNavigate()
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
   const [form, setForm] = useState({
     source: '', destination: '', startDate: '', endDate: '',
@@ -130,6 +132,13 @@ export default function PlanTrip() {
   const [distance, setDistance] = useState(null)
   const [generating, setGenerating] = useState(false)
   const [surpriseLoading, setSurpriseLoading] = useState(false)
+  const [showMap, setShowMap] = useState(false)
+
+  useEffect(() => {
+    function handleResize() { setIsMobile(window.innerWidth < 768) }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     if (sourceCoords && destCoords) {
@@ -153,6 +162,7 @@ export default function PlanTrip() {
     setForm(prev => ({ ...prev, [name]: value }))
     if (name === 'source') setSourceCoords(coords)
     if (name === 'destination') setDestCoords(coords)
+    if (isMobile && (sourceCoords || destCoords)) setShowMap(true)
   }
 
   async function handleSurprise() {
@@ -211,7 +221,8 @@ export default function PlanTrip() {
   const inputStyle = {
     width: '100%', padding: '0.75rem 1rem', fontSize: '0.9rem',
     background: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border)',
-    color: 'var(--color-cream)', outline: 'none', transition: 'border-color 0.3s', fontFamily: 'inherit'
+    color: 'var(--color-cream)', outline: 'none', transition: 'border-color 0.3s',
+    fontFamily: 'inherit', boxSizing: 'border-box'
   }
 
   const labelStyle = {
@@ -219,20 +230,53 @@ export default function PlanTrip() {
     color: 'var(--color-gold)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: 4
   }
 
+  const MapSection = () => (
+    <div style={{ position: 'relative', height: isMobile ? 300 : '100%', width: '100%' }}>
+      <MapContainer
+        key={`${mapCenter[0]}-${mapCenter[1]}-${mapZoom}`}
+        center={mapCenter} zoom={mapZoom}
+        style={{ height: '100%', width: '100%' }}
+      >
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://carto.com">CARTO</a>'
+        />
+        {sourceCoords && <Marker position={sourceCoords}><Popup>{form.source}</Popup></Marker>}
+        {destCoords && <Marker position={destCoords}><Popup>{form.destination}</Popup></Marker>}
+        {sourceCoords && destCoords && (
+          <Polyline
+            positions={[sourceCoords, destCoords]}
+            pathOptions={{ color: '#C9A84C', weight: 2, dashArray: '8, 8', opacity: 0.8 }}
+          />
+        )}
+      </MapContainer>
+      {!sourceCoords && !destCoords && (
+        <div style={{
+          position: 'absolute', bottom: '1rem', left: '50%', transform: 'translateX(-50%)',
+          padding: '0.5rem 1rem', background: 'rgba(8,8,8,0.85)',
+          border: '1px solid var(--color-border)', backdropFilter: 'blur(8px)',
+          fontSize: '0.75rem', color: 'var(--color-cream-muted)', whiteSpace: 'nowrap', zIndex: 1000
+        }}>
+          Enter locations to see route
+        </div>
+      )}
+    </div>
+  )
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-bg)', color: 'var(--color-cream)' }}>
 
       {/* Navbar */}
       <nav style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '1.25rem 2rem', borderBottom: '1px solid var(--color-border)',
+        padding: '1rem 1.5rem', borderBottom: '1px solid var(--color-border)',
         background: 'rgba(8,8,8,0.9)', backdropFilter: 'blur(12px)',
         position: 'sticky', top: 0, zIndex: 50
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}
-        onClick={() => navigate('/')}>
+          onClick={() => navigate('/')}>
           <div style={{
-            width: 32, height: 32, borderRadius: 4,
+            width: 32, height: 32, borderRadius: 4, flexShrink: 0,
             background: 'linear-gradient(135deg, var(--color-gold), var(--color-gold-dark))',
             display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}>
@@ -244,8 +288,8 @@ export default function PlanTrip() {
           style={{
             display: 'flex', alignItems: 'center', gap: '0.4rem',
             background: 'transparent', border: '1px solid var(--color-border)',
-            color: 'var(--color-cream-muted)', padding: '0.4rem 1rem',
-            fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer'
+            color: 'var(--color-cream-muted)', padding: '0.4rem 0.75rem',
+            fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer'
           }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--color-gold)'; e.currentTarget.style.color = 'var(--color-gold)' }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--color-border)'; e.currentTarget.style.color = 'var(--color-cream-muted)' }}
@@ -254,44 +298,69 @@ export default function PlanTrip() {
         </button>
       </nav>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: 'calc(100vh - 65px)' }}>
+      {/* Mobile map toggle */}
+      {isMobile && (sourceCoords || destCoords) && (
+        <button
+          onClick={() => setShowMap(prev => !prev)}
+          style={{
+            width: '100%', padding: '0.6rem', fontSize: '0.7rem', letterSpacing: '0.15em',
+            textTransform: 'uppercase', background: 'rgba(201,168,76,0.08)',
+            border: 'none', borderBottom: '1px solid var(--color-border)',
+            color: 'var(--color-gold)', cursor: 'pointer'
+          }}
+        >
+          {showMap ? 'Hide Map ↑' : 'Show Route on Map ↓'}
+        </button>
+      )}
+
+      {/* Mobile map */}
+      {isMobile && showMap && (
+        <div style={{ height: 280, borderBottom: '1px solid var(--color-border)' }}>
+          <MapSection />
+        </div>
+      )}
+
+      <div style={{
+        display: isMobile ? 'block' : 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        minHeight: 'calc(100vh - 65px)'
+      }}>
 
         {/* LEFT — Form */}
         <motion.div
           initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-          style={{ padding: '3rem 2.5rem', borderRight: '1px solid var(--color-border)', overflowY: 'auto' }}
+          style={{
+            padding: isMobile ? '1.5rem 1rem' : '3rem 2.5rem',
+            borderRight: isMobile ? 'none' : '1px solid var(--color-border)',
+            overflowY: 'auto'
+          }}
         >
-          <p style={{ fontSize: '0.7rem', letterSpacing: '0.4em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.75rem' }}>New Journey</p>
-          <h1 style={{ fontSize: '2rem', fontWeight: 300, marginBottom: '2.5rem' }}>Plan your trip</h1>
+          <p style={{ fontSize: '0.7rem', letterSpacing: '0.4em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.5rem' }}>New Journey</p>
+          <h1 style={{ fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: 300, marginBottom: '2rem' }}>Plan your trip</h1>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
             <PlaceInput
               label="From" name="source" value={form.source}
-              icon={<MapPin size={10} />}
-              placeholder="e.g. Delhi"
-              onChange={handleChange}
-              onSelect={handleSelect}
+              icon={<MapPin size={10} />} placeholder="e.g. Delhi"
+              onChange={handleChange} onSelect={handleSelect}
             />
 
-            {/* Destination with surprise button */}
             <div>
-              <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <label style={{ ...labelStyle, marginBottom: '0.5rem' }}>
                 <MapPin size={10} /> To
               </label>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <div style={{ flex: 1 }}>
                   <PlaceInput
                     label="" name="destination" value={form.destination}
-                    icon={null}
-                    placeholder="e.g. Manali"
-                    onChange={handleChange}
-                    onSelect={handleSelect}
+                    icon={null} placeholder="e.g. Manali"
+                    onChange={handleChange} onSelect={handleSelect}
                   />
                 </div>
                 <button onClick={handleSurprise} disabled={surpriseLoading} title="Surprise me!"
                   style={{
-                    padding: '0 1rem', background: 'rgba(201,168,76,0.08)',
+                    padding: '0 0.875rem', background: 'rgba(201,168,76,0.08)',
                     border: '1px solid var(--color-border)', color: 'var(--color-gold)',
                     cursor: 'pointer', alignSelf: 'flex-end', height: '42px', flexShrink: 0
                   }}
@@ -305,8 +374,7 @@ export default function PlanTrip() {
               </div>
             </div>
 
-            {/* Dates */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <div>
                 <label style={labelStyle}><Calendar size={10} />Start Date</label>
                 <input type="date" name="startDate" value={form.startDate} onChange={handleChange}
@@ -325,8 +393,7 @@ export default function PlanTrip() {
               </div>
             </div>
 
-            {/* Budget & Travelers */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <div>
                 <label style={labelStyle}><Wallet size={10} />Budget (₹)</label>
                 <input type="number" name="budget" value={form.budget} onChange={handleChange}
@@ -345,7 +412,6 @@ export default function PlanTrip() {
               </div>
             </div>
 
-            {/* Preferences */}
             <div>
               <label style={labelStyle}><Sparkles size={10} />Preferences (optional)</label>
               <textarea name="preferences" value={form.preferences} onChange={handleChange}
@@ -356,7 +422,6 @@ export default function PlanTrip() {
               />
             </div>
 
-            {/* Distance badge */}
             <AnimatePresence>
               {distance && (
                 <motion.div
@@ -366,7 +431,7 @@ export default function PlanTrip() {
                     background: 'rgba(201,168,76,0.05)', display: 'flex', alignItems: 'center', gap: '0.5rem'
                   }}
                 >
-                  <MapPin size={13} style={{ color: 'var(--color-gold)' }} />
+                  <MapPin size={13} style={{ color: 'var(--color-gold)', flexShrink: 0 }} />
                   <span style={{ fontSize: '0.8rem', color: 'var(--color-cream-muted)' }}>
                     {form.source} → {form.destination} is approximately{' '}
                     <span style={{ color: 'var(--color-gold)', fontWeight: 500 }}>{distance} km</span>
@@ -375,14 +440,13 @@ export default function PlanTrip() {
               )}
             </AnimatePresence>
 
-            {/* Submit */}
             <motion.button
               whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
               onClick={handleSubmit} disabled={generating}
               style={{
                 width: '100%', padding: '1rem', fontSize: '0.8rem', letterSpacing: '0.2em',
                 textTransform: 'uppercase', fontWeight: 600,
-                cursor: generating ? 'not-allowed' : 'pointer', border: 'none', marginTop: '0.5rem',
+                cursor: generating ? 'not-allowed' : 'pointer', border: 'none',
                 background: generating ? 'rgba(201,168,76,0.4)' : 'linear-gradient(135deg, var(--color-gold), var(--color-gold-dark))',
                 color: 'var(--color-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
               }}
@@ -399,41 +463,15 @@ export default function PlanTrip() {
           </div>
         </motion.div>
 
-        {/* RIGHT — Map */}
-        <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-          style={{ position: 'sticky', top: 65, height: 'calc(100vh - 65px)', display: 'flex', flexDirection: 'column' }}
-        >
-          <MapContainer
-            key={`${mapCenter[0]}-${mapCenter[1]}-${mapZoom}`}
-            center={mapCenter} zoom={mapZoom}
-            style={{ flex: 1, width: '100%' }}
+        {/* RIGHT — Map (desktop only) */}
+        {!isMobile && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+            style={{ position: 'sticky', top: 65, height: 'calc(100vh - 65px)', display: 'flex', flexDirection: 'column' }}
           >
-            <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-              attribution='&copy; <a href="https://carto.com">CARTO</a>'
-            />
-            {sourceCoords && <Marker position={sourceCoords}><Popup>{form.source}</Popup></Marker>}
-            {destCoords && <Marker position={destCoords}><Popup>{form.destination}</Popup></Marker>}
-            {sourceCoords && destCoords && (
-              <Polyline
-                positions={[sourceCoords, destCoords]}
-                pathOptions={{ color: '#C9A84C', weight: 2, dashArray: '8, 8', opacity: 0.8 }}
-              />
-            )}
-          </MapContainer>
-
-          {!sourceCoords && !destCoords && (
-            <div style={{
-              position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)',
-              padding: '0.6rem 1.2rem', background: 'rgba(8,8,8,0.85)',
-              border: '1px solid var(--color-border)', backdropFilter: 'blur(8px)',
-              fontSize: '0.75rem', color: 'var(--color-cream-muted)', whiteSpace: 'nowrap', zIndex: 1000
-            }}>
-              Enter source & destination to see route
-            </div>
-          )}
-        </motion.div>
+            <MapSection />
+          </motion.div>
+        )}
       </div>
 
       <style>{`

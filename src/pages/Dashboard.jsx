@@ -44,15 +44,15 @@ export default function Dashboard() {
       {/* Navbar */}
       <nav style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '1.25rem 2rem',
+        padding: '1rem 1.5rem',
         borderBottom: '1px solid var(--color-border)',
         background: 'rgba(8,8,8,0.9)', backdropFilter: 'blur(12px)',
         position: 'sticky', top: 0, zIndex: 50
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', flexShrink: 0 }}
           onClick={() => navigate('/')}>
           <div style={{
-            width: 32, height: 32, borderRadius: 4,
+            width: 32, height: 32, borderRadius: 4, flexShrink: 0,
             background: 'linear-gradient(135deg, var(--color-gold), var(--color-gold-dark))',
             display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}>
@@ -63,27 +63,24 @@ export default function Dashboard() {
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--color-cream-muted)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <span style={{
+            fontSize: '0.8rem', color: 'var(--color-cream-muted)',
+            maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+          }}>
             {user?.firstName || user?.emailAddresses[0]?.emailAddress}
           </span>
           <button
             onClick={() => signOut(() => navigate('/'))}
             style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
-              padding: '0.4rem 1rem', fontSize: '0.75rem', letterSpacing: '0.1em',
+              padding: '0.4rem 0.75rem', fontSize: '0.7rem', letterSpacing: '0.1em',
               textTransform: 'uppercase', background: 'transparent', cursor: 'pointer',
               border: '1px solid var(--color-border)', color: 'var(--color-cream-muted)',
-              transition: 'all 0.3s'
+              transition: 'all 0.3s', flexShrink: 0
             }}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = 'var(--color-gold)'
-              e.currentTarget.style.color = 'var(--color-gold)'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = 'var(--color-border)'
-              e.currentTarget.style.color = 'var(--color-cream-muted)'
-            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--color-gold)'; e.currentTarget.style.color = 'var(--color-gold)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--color-border)'; e.currentTarget.style.color = 'var(--color-cream-muted)' }}
           >
             <LogOut size={13} />
             Sign Out
@@ -91,18 +88,18 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '3rem 2rem' }}>
+      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 1.5rem' }}>
 
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '3rem' }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem', gap: '1rem' }}
         >
           <div>
             <p style={{ fontSize: '0.7rem', letterSpacing: '0.4em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.5rem' }}>
               Welcome back
             </p>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 300 }}>
+            <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', fontWeight: 300 }}>
               {user?.firstName ? `${user.firstName}'s Trips` : 'Your Trips'}
             </h1>
           </div>
@@ -111,8 +108,8 @@ export default function Dashboard() {
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
             onClick={() => navigate('/plan')}
             style={{
-              display: 'flex', alignItems: 'center', gap: '0.5rem',
-              padding: '0.75rem 1.5rem', fontSize: '0.75rem', letterSpacing: '0.15em',
+              display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0,
+              padding: '0.75rem 1.25rem', fontSize: '0.75rem', letterSpacing: '0.15em',
               textTransform: 'uppercase', fontWeight: 600, cursor: 'pointer', border: 'none',
               background: 'linear-gradient(135deg, var(--color-gold), var(--color-gold-dark))',
               color: 'var(--color-bg)'
@@ -125,10 +122,10 @@ export default function Dashboard() {
 
         {/* Content */}
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: 'var(--color-border)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1px', background: 'var(--color-border)' }}>
             {[...Array(3)].map((_, i) => (
               <div key={i} style={{ background: 'var(--color-bg)', padding: '2rem', height: 200 }}>
-                <div style={{ height: 12, width: '60%', background: 'rgba(201,168,76,0.1)', borderRadius: 4, marginBottom: 12, animation: 'pulse 1.5s infinite' }} />
+                <div style={{ height: 12, width: '60%', background: 'rgba(201,168,76,0.1)', borderRadius: 4, marginBottom: 12 }} />
                 <div style={{ height: 8, width: '40%', background: 'rgba(201,168,76,0.07)', borderRadius: 4 }} />
               </div>
             ))}
@@ -136,7 +133,7 @@ export default function Dashboard() {
         ) : trips.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            style={{ textAlign: 'center', padding: '6rem 2rem', border: '1px solid var(--color-border)' }}
+            style={{ textAlign: 'center', padding: '4rem 1.5rem', border: '1px solid var(--color-border)' }}
           >
             <Compass size={40} style={{ color: 'var(--color-gold)', margin: '0 auto 1.5rem', opacity: 0.6 }} />
             <p style={{ fontSize: '1.1rem', fontWeight: 300, marginBottom: '0.5rem' }}>No trips yet</p>
@@ -154,12 +151,11 @@ export default function Dashboard() {
                 color: 'var(--color-bg)'
               }}
             >
-              <Plus size={15} />
-              Plan Your First Trip
+              <Plus size={15} /> Plan Your First Trip
             </motion.button>
           </motion.div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1px', background: 'var(--color-border)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '1px', background: 'var(--color-border)' }}>
             {trips.map((trip, i) => (
               <motion.div
                 key={trip.id}
@@ -168,20 +164,18 @@ export default function Dashboard() {
                 transition={{ delay: i * 0.06 }}
                 onClick={() => navigate(`/trip/${trip.id}`)}
                 style={{
-                  background: 'var(--color-bg)', padding: '2rem', cursor: 'pointer',
+                  background: 'var(--color-bg)', padding: '1.5rem', cursor: 'pointer',
                   transition: 'background 0.3s', position: 'relative'
                 }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'var(--color-bg)'}
               >
-                {/* Delete button */}
                 <button
                   onClick={(e) => deleteTrip(trip.id, e)}
                   style={{
                     position: 'absolute', top: '1rem', right: '1rem',
                     background: 'transparent', border: 'none', cursor: 'pointer',
-                    color: 'var(--color-cream-subtle)', padding: '0.25rem',
-                    transition: 'color 0.3s'
+                    color: 'var(--color-cream-subtle)', padding: '0.25rem', transition: 'color 0.3s'
                   }}
                   onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
                   onMouseLeave={e => e.currentTarget.style.color = 'var(--color-cream-subtle)'}
@@ -189,18 +183,18 @@ export default function Dashboard() {
                   <Trash2 size={15} />
                 </button>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                   <MapPin size={14} style={{ color: 'var(--color-gold)' }} />
                   <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'var(--color-gold)' }}>
                     {trip.source} → {trip.destination}
                   </span>
                 </div>
 
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 400, marginBottom: '1.5rem', paddingRight: '2rem' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 400, marginBottom: '1.25rem', paddingRight: '2rem' }}>
                   {trip.title || `Trip to ${trip.destination}`}
                 </h3>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Calendar size={12} style={{ color: 'var(--color-cream-subtle)' }} />
                     <span style={{ fontSize: '0.75rem', color: 'var(--color-cream-muted)' }}>
@@ -216,7 +210,7 @@ export default function Dashboard() {
                 </div>
 
                 <div style={{
-                  marginTop: '1.5rem', paddingTop: '1.5rem',
+                  marginTop: '1.25rem', paddingTop: '1.25rem',
                   borderTop: '1px solid var(--color-border)',
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                 }}>

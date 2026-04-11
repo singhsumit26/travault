@@ -131,6 +131,7 @@ export default function TripDetails() {
     setExporting(false)
   }
 
+
   function handleShare() {
     navigator.clipboard.writeText(window.location.href)
     toast.success('Link copied to clipboard!')
@@ -507,4 +508,4 @@ export default function TripDetails() {
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   )
-}
+}   
